@@ -117,10 +117,12 @@ export const updateGithubCheck = (
 ) => {
   const chunkedAnnotations = chunk(annotations);
 
-  return TE.tryCatch(
-    () =>
-      Promise.all(chunkedAnnotations.map(annotationChunk =>
-        octokit.checks.update({
+  return TE.tryCatch(() => {
+    console.log('exec all');
+    return Promise.all(
+      chunkedAnnotations.map(annotationChunk => {
+        console.log('update', annotationChunk);
+        return octokit.checks.update({
           check_run_id: check.id,
           owner: event.owner,
           name: check.name,
@@ -138,8 +140,8 @@ export const updateGithubCheck = (
 
             annotations: annotationChunk,
           },
-        })
-      )),
-    E.toError
-  )
+        });
+      })
+    );
+  }, E.toError);
 };

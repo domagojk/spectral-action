@@ -120,6 +120,8 @@ export const updateGithubCheck = (
 ) => {
   const chunkedAnnotations = chunk(annotations.length ? annotations : []);
 
+  console.log({ chunkedAnnotations, annotations, test: chunk([]) })
+
   const updateAttempts = chunkedAnnotations.map(annotationChunk =>
     TE.tryCatch(
       () =>

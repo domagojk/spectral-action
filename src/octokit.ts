@@ -141,7 +141,7 @@ export const updateGithubCheck = (
 
             annotations: annotationChunk,
           },
-        }),
+        }).catch(console.log),
       E.toError
     )
   );

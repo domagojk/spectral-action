@@ -118,7 +118,7 @@ export const updateGithubCheck = (
   const chunkedAnnotations = chunk(annotations);
 
   return TE.tryCatch(() => {
-    console.log('exec all');
+    console.log('exec all', { chunkedAnnotations, annotations });
     return Promise.all(
       chunkedAnnotations.map(annotationChunk => {
         console.log('update', annotationChunk);

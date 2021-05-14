@@ -120,10 +120,11 @@ export const updateGithubCheck = (
 ) => {
   const chunkedAnnotations = chunk(annotations);
 
+  console.log({ chunkedAnnotations, check })
   const updateAttempts = chunkedAnnotations.map(annotationChunk =>
     TE.tryCatch(
-      () =>
-        octokit.checks.update({
+      () => {
+        const params = {
           check_run_id: check.id,
           owner: event.owner,
           name: check.name,
@@ -141,7 +142,13 @@ export const updateGithubCheck = (
 
             annotations: annotationChunk,
           },
-        }),
+        }
+        console.log('updating', params)
+        return octokit.checks.update(params).catch(err => {
+          console.log(err)
+          throw err;
+        })
+      },
       E.toError
     )
   );

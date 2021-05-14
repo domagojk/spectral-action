@@ -15,35 +15,15 @@ export type Annotations = NonNullable<
 type Conclusions = Endpoints['PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}']['parameters']['conclusion'];
 type GitHub = ReturnType<typeof getOctokit>;
 
-const RepositoryStruct = D.struct({
-  name: D.string,
-  owner: D.struct({
-    login: D.string,
-  }),
-});
-
-const PullRequestEvent = pipe(
-  D.struct({
-    repository: RepositoryStruct,
-    pull_request: D.struct({
-      head: D.struct({
-        sha: D.string,
-      }),
+const EventDecoder = D.type({
+  after: D.string,
+  repository: D.type({
+    name: D.string,
+    owner: D.type({
+      login: D.string,
     }),
   }),
-  D.intersect(
-    D.partial({
-      after: D.string,
-    })
-  )
-);
-
-const PushEvent = D.struct({
-  after: D.string,
-  repository: RepositoryStruct,
 });
-
-const EventDecoder = D.union(PullRequestEvent, PushEvent);
 
 type Event = D.TypeOf<typeof EventDecoder>;
 

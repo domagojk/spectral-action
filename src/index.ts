@@ -155,8 +155,6 @@ const program = pipe(
     )
   ),
   TE.map(({ checkResponse, repositoryInfo, annotations }) => {
-    console.log({ checkResponse });
-
     checkResponse.map(res => {
       info(`Check run '${res.data.name}' concluded with '${res.data.conclusion}' (${res.data.html_url})`);
       info(

@@ -118,40 +118,35 @@ export const updateGithubCheck = (
   conclusion: Conclusions,
   message?: string
 ) => {
-  const chunkedAnnotations = chunk(annotations);
 
-  console.log({ chunkedAnnotations, check })
-  const updateAttempts = chunkedAnnotations.map(annotationChunk =>
-    TE.tryCatch(
-      () => {
-        const params = {
-          check_run_id: check.id,
-          owner: event.owner,
-          name: check.name,
-          repo: event.repo,
-          status: 'completed',
-          conclusion,
-          completed_at: new Date().toISOString(),
-          output: {
-            title: check.name,
-            summary: message
-              ? message
-              : conclusion === 'success'
-              ? 'Lint completed successfully'
-              : 'Lint completed with some errors',
+  console.log(12, { check })
+  return TE.tryCatch(
+    () => {
+      const params = {
+        check_run_id: check.id,
+        owner: event.owner,
+        name: check.name,
+        repo: event.repo,
+        status: 'completed',
+        conclusion,
+        completed_at: new Date().toISOString(),
+        output: {
+          title: check.name,
+          summary: message
+            ? message
+            : conclusion === 'success'
+            ? 'Lint completed successfully'
+            : 'Lint completed with some errors',
 
-            annotations: annotationChunk,
-          },
-        }
-        console.log('updating', params)
-        return octokit.checks.update(params).catch(err => {
-          console.log(err)
-          throw err;
-        })
-      },
-      E.toError
-    )
-  );
-
-  return sequenceTaskEither(updateAttempts);
+          annotations,
+        },
+      }
+      console.log('updating', params)
+      return octokit.checks.update(params).catch(err => {
+        console.log(err)
+        throw err;
+      })
+    },
+    E.toError
+  )
 };

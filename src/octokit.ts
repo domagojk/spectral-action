@@ -120,6 +120,7 @@ export const updateGithubCheck = (
 ) => {
   const chunkedAnnotations = chunk(annotations);
 
+  console.log({ chunkedAnnotations, check })
   const updateAttempts = chunkedAnnotations.map(annotationChunk =>
     TE.tryCatch(
       () =>
@@ -141,7 +142,10 @@ export const updateGithubCheck = (
 
             annotations: annotationChunk,
           },
-        }).catch(console.log),
+        }).catch(err => {
+          console.log(err)
+          throw err;
+        }),
       E.toError
     )
   );

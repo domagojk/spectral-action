@@ -2,12 +2,9 @@ import { getOctokit } from '@actions/github';
 import * as TE from 'fp-ts/TaskEither';
 import * as E from 'fp-ts/Either';
 import * as D from 'io-ts/Decoder';
-import { sequence } from 'fp-ts/Array';
 import type { Endpoints, GetResponseDataTypeFromEndpointMethod } from '@octokit/types';
 import { pipe } from 'fp-ts/function';
 import { chunk } from 'lodash';
-
-const sequenceTaskEither = sequence(TE.taskEither);
 
 export type Annotations = NonNullable<
   NonNullable<Endpoints['PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}']['parameters']['output']>['annotations']
@@ -120,9 +117,9 @@ export const updateGithubCheck = (
 ) => {
   const chunkedAnnotations = chunk(annotations);
 
-  const updateAttempts = chunkedAnnotations.map(annotationChunk =>
-    TE.tryCatch(
-      () =>
+  return TE.tryCatch(
+    () =>
+      Promise.all(chunkedAnnotations.map(annotationChunk =>
         octokit.checks.update({
           check_run_id: check.id,
           owner: event.owner,
@@ -141,10 +138,8 @@ export const updateGithubCheck = (
 
             annotations: annotationChunk,
           },
-        }),
-      E.toError
-    )
-  );
-
-  return sequenceTaskEither(updateAttempts);
+        })
+      )),
+    E.toError
+  )
 };
